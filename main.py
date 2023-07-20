@@ -7,8 +7,10 @@ from starlette.staticfiles import StaticFiles
 import models
 from database.database import engine
 from routes.auth_route import auth
+from routes.cart_route import cart
 from routes.category_route import category
 from routes.media_route import media
+from routes.order_route import order
 from routes.product_route import product
 from routes.user_route import user
 from schemas.schema import Route
@@ -42,4 +44,6 @@ app.include_router(prefix="/api", router=user)
 app.include_router(prefix="/api", router=category)
 app.include_router(prefix="/api", router=product)
 app.include_router(prefix="/api", router=media)
+app.include_router(prefix="/api", router=cart)
+app.include_router(prefix="/api", router=order)
 app.mount("/medias", StaticFiles(directory="medias"), name="medias")

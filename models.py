@@ -13,6 +13,13 @@ class UserRole(str, Enum):
     USER = 'user'
 
 
+class OrderStatus(str, Enum):
+    PENDING = 'pending'
+    DELIVERING = 'delivering'
+    DELIVERED = 'delivered'
+    CANCELLED = 'cancelled'
+
+
 class User(Base):
     __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
@@ -25,6 +32,8 @@ class User(Base):
     refresh_token = Column(String(255), nullable=True)
 
     user_information = relationship("UserInformation", back_populates="user", uselist=False)
+    carts = relationship("Cart", back_populates="user", uselist=False)
+    orders = relationship("Order", back_populates="user", uselist=True)
 
 
 class UserInformation(Base):
@@ -64,6 +73,8 @@ class Product(Base):
 
     images = relationship('Image', back_populates='product', uselist=True)
     category = relationship('Category', back_populates='products')
+    cart_items = relationship('CartItem', back_populates='product', uselist=True)
+    order_items = relationship('OrderItem', back_populates='product', uselist=True)
     created_at = Column(String(255), default=datetime.datetime.utcnow())
     updated_at = Column(String(255), default=datetime.datetime.utcnow())
 
@@ -77,5 +88,59 @@ class Image(Base):
     product_id = Column(Integer, ForeignKey('products.id'))
 
     product = relationship('Product', back_populates='images')
+    created_at = Column(String(255), default=datetime.datetime.utcnow())
+    updated_at = Column(String(255), default=datetime.datetime.utcnow())
+
+
+class Cart(Base):
+    __tablename__ = 'carts'
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+
+    user = relationship('User', back_populates='carts')
+    cart_items = relationship('CartItem', back_populates='cart', uselist=True)
+    created_at = Column(String(255), default=datetime.datetime.utcnow())
+    updated_at = Column(String(255), default=datetime.datetime.utcnow())
+
+
+class CartItem(Base):
+    __tablename__ = 'cart_items'
+
+    id = Column(Integer, primary_key=True, index=True)
+    cart_id = Column(Integer, ForeignKey('carts.id'))
+    product_id = Column(Integer, ForeignKey('products.id'))
+    quantity = Column(Integer, default=1, nullable=False)
+
+    cart = relationship('Cart', back_populates='cart_items')
+    product = relationship('Product', back_populates='cart_items', uselist=False)
+    created_at = Column(String(255), default=datetime.datetime.utcnow())
+    updated_at = Column(String(255), default=datetime.datetime.utcnow())
+
+
+class Order(Base):
+    __tablename__ = 'orders'
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    total = Column(Integer, default=0, nullable=False)
+    status = Column(String(255), default=OrderStatus.PENDING, nullable=False)
+
+    user = relationship('User', back_populates='orders')
+    order_items = relationship('OrderItem', back_populates='order', uselist=True)
+    created_at = Column(String(255), default=datetime.datetime.utcnow())
+    updated_at = Column(String(255), default=datetime.datetime.utcnow())
+
+
+class OrderItem(Base):
+    __tablename__ = 'order_items'
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    product_id = Column(Integer, ForeignKey('products.id'))
+    quantity = Column(Integer, default=1, nullable=False)
+
+    order = relationship('Order', back_populates='order_items')
+    product = relationship('Product', back_populates='order_items', uselist=False)
     created_at = Column(String(255), default=datetime.datetime.utcnow())
     updated_at = Column(String(255), default=datetime.datetime.utcnow())
