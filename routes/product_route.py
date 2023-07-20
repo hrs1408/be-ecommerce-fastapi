@@ -27,7 +27,7 @@ def get_product_by_id(product_id: int, db: Session = Depends(get_db)):
     return ResponseSchema.from_api_route(status_code=200, data=product_find).dict(exclude_none=True)
 
 
-@product.get("/{product_name}", response_model=ResponseSchema[ProductSchema])
+@product.get("/name/{product_name}", response_model=ResponseSchema[ProductSchema])
 def get_product_by_name(product_name: str, db: Session = Depends(get_db)):
     product_find = ProductRepository.find_by_name(db, product_name)
     if not product_find:

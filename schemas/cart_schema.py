@@ -13,6 +13,8 @@ class PutProductToCartSchema(BaseModel):
     product_id: int
     quantity: int
 
+class CartItemUpdateQuantitySchema(BaseModel):
+    quantity: int
 
 class CartSchemaBase(BaseModel):
     user_id: int
@@ -20,7 +22,7 @@ class CartSchemaBase(BaseModel):
 
 class CartSchema(CartSchemaBase):
     id: int
-    cartItems: Optional[List[CartItemSchema]]
+    cart_items: Optional[List[CartItemSchema]]
 
     class Config:
         orm_mode = True
