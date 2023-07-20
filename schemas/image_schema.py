@@ -1,8 +1,15 @@
 from pydantic import BaseModel
 
 
+class ImageCreateSchema(BaseModel):
+    file_path: str
+    file_name: str
+    product_id: int
+
+
 class ImageBase(BaseModel):
-    url: str
+    file_path: str
+    file_name: str
 
 
 class ImageSchema(ImageBase):

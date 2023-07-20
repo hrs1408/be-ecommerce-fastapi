@@ -7,7 +7,9 @@ import models
 from database.database import engine
 from routes.auth_route import auth
 from routes.category_route import category
+from routes.media_route import media
 from routes.product_route import product
+from routes.user_route import user
 from schemas.schema import Route
 
 models.Base.metadata.create_all(bind=engine)
@@ -35,5 +37,7 @@ def start_up_event():
 
 
 app.include_router(prefix="/api", router=auth)
+app.include_router(prefix="/api", router=user)
 app.include_router(prefix="/api", router=category)
 app.include_router(prefix="/api", router=product)
+app.include_router(prefix="/api", router=media)

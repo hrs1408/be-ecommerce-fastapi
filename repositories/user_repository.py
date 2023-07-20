@@ -10,6 +10,10 @@ class UserRepository(BaseRepository):
         return db.query(User).filter(User.email == email).first()
 
     @staticmethod
+    def find_by_role(db: Session, role):
+        return db.query(User).filter(User.user_role == role).all()
+
+    @staticmethod
     def find_by_refresh_token_sub(db: Session, sub):
         return db.query(User).filter(User.refresh_token == sub).first()
 
