@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from config import get_db
@@ -26,12 +26,14 @@ def get_cart_by_user_id(sub: int = Depends(get_current_user), db: Session = Depe
     return ResponseSchema.from_api_route(status_code=200, data=cart_exits).dict(exclude_none=True)
 
 
+
+
 @cart.post("/", response_model=ResponseSchema[CartItemSchema])
 def insert_product_to_cart(data_in: PutProductToCartSchema, sub: int = Depends(get_current_user),
                            db: Session = Depends(get_db)):
     user_id = UserRepository.find_by_id(db, User, sub).id
     if not user_id:
-        return ResponseSchema.from_api_route(status_code=404, data="User not found").dict(exclude_none=True)
+        raise HTTPException(status_code=404, detail="User not found")
     cart_exits = CartRepository.find_by_user_id(db, user_id)
     if not cart_exits:
         new_cart = Cart(
@@ -55,16 +57,16 @@ def insert_product_to_cart(data_in: PutProductToCartSchema, sub: int = Depends(g
     return ResponseSchema.from_api_route(status_code=200, data=response).dict(exclude_none=True)
 
 
-@cart.delete("/{cart_item_id}", response_model=ResponseSchema)
+@cart.delete("/{cart_item_id}", response_model=ResponseSchema[CartItemSchema])
 def delete_cart_item(cart_item_id: int, sub: int = Depends(get_current_user),
                      db: Session = Depends(get_db)):
     user_id = UserRepository.find_by_id(db, User, sub).id
     cart = CartRepository.find_by_user_id(db, user_id)
     if not cart:
-        return ResponseSchema.from_api_route(status_code=404, data="Cart not found").dict(exclude_none=True)
+        raise HTTPException(status_code=404, detail="Cart not found")
     cart_item = CartItemRepository.find_by_id(db, CartItem, cart_item_id)
     if not cart_item:
-        return ResponseSchema.from_api_route(status_code=404, data="Cart item not found").dict(exclude_none=True)
+        raise HTTPException(status_code=404, detail="Cart item not found")
     CartItemRepository.delete(db, cart_item)
     return ResponseSchema.from_api_route(status_code=200, data="Delete successfully").dict(exclude_none=True)
 
@@ -75,10 +77,10 @@ def update_cart_item(cart_item_id: int, data: CartItemUpdateQuantitySchema, sub:
     user_id = UserRepository.find_by_id(db, User, sub).id
     cart = CartRepository.find_by_user_id(db, user_id)
     if not cart:
-        return ResponseSchema.from_api_route(status_code=404, data="Cart not found").dict(exclude_none=True)
+        raise HTTPException(status_code=404, detail="Cart not found")
     cart_item = CartItemRepository.find_by_id(db, CartItem, cart_item_id)
     if not cart_item:
-        return ResponseSchema.from_api_route(status_code=404, data="Cart item not found").dict(exclude_none=True)
+        raise HTTPException(status_code=404, detail="Cart item not found")
     cart_item.quantity = data.quantity
     CartItemRepository.update(db, cart_item)
     return ResponseSchema.from_api_route(status_code=200, data=cart_item).dict(exclude_none=True)

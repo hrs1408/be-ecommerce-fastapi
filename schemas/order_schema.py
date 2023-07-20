@@ -13,7 +13,7 @@ class OrderSchemaBase(BaseModel):
 
 class OrderSchema(OrderSchemaBase):
     id: int
-    orderItems: Optional[List[OrderItemSchema]]
+    order_items: Optional[List[OrderItemSchema]]
 
     class Config:
         orm_mode = True

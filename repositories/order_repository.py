@@ -7,7 +7,7 @@ from repositories.base_repository import BaseRepository
 class OrderRepository(BaseRepository):
     @staticmethod
     def find_by_user_id(db: Session, user_id):
-        return db.query(Order).filter(Order.user_id == user_id).first()
+        return db.query(Order).filter(Order.user_id == user_id).all()
 
 
 class OrderItemRepository(BaseRepository):
