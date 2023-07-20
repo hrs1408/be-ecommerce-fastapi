@@ -25,9 +25,9 @@ class UserCreateSchema(BaseModel):
 
 class UserInformationBase(BaseModel):
     full_name: str
-    phone_number: str
-    address: str
-    dob: str
+    phone_number: Optional[str]
+    address: Optional[str]
+    dob: Optional[str]
 
 
 class UserInformationSchema(UserInformationBase):
