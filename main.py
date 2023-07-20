@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi_responseschema import wrap_app_responses
 from passlib.context import CryptContext
 from sqlalchemy.orm import sessionmaker
+from starlette.staticfiles import StaticFiles
 
 import models
 from database.database import engine
@@ -41,3 +42,4 @@ app.include_router(prefix="/api", router=user)
 app.include_router(prefix="/api", router=category)
 app.include_router(prefix="/api", router=product)
 app.include_router(prefix="/api", router=media)
+app.mount("/medias", StaticFiles(directory="medias"), name="medias")

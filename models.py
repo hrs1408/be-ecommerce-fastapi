@@ -79,15 +79,3 @@ class Image(Base):
     product = relationship('Product', back_populates='images')
     created_at = Column(String(255), default=datetime.datetime.utcnow())
     updated_at = Column(String(255), default=datetime.datetime.utcnow())
-
-
-class FileData(Base):
-    __tablename__ = "files"
-
-    id = Column(Integer, primary_key=True, index=True)
-    file_name = Column(String(255), nullable=False)
-    file_path = Column(String(255), nullable=False)
-    file = Column(BLOB, nullable=False)
-    content_type = Column(String(255), nullable=False)
-    created_at = Column(String(255), default=datetime.datetime.utcnow())
-    updated_at = Column(String(255), default=datetime.datetime.utcnow())
