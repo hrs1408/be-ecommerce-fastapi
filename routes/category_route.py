@@ -13,7 +13,7 @@ from repositories.category_repository import CategoryRepository
 category = APIRouter(prefix="/categories", tags=["Category"])
 
 
-@category.get("/", dependencies=[Depends(JWTBearer())], response_model=ResponseSchema[List[CategorySchema]])
+@category.get("/", response_model=ResponseSchema[List[CategorySchema]])
 def get_all_categories(db: Session = Depends(get_db)):
     categories = CategoryRepository.find_all(db, Category)
     return ResponseSchema.from_api_route(status_code=200, data=categories).dict(exclude_none=True)

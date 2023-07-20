@@ -9,7 +9,7 @@ from models import User, UserInformation
 from repositories.jwt_repository import JWTBearer
 from repositories.user_repository import UserRepository, UserInformationRepository
 from schemas.schema import ResponseSchema
-from schemas.user_schema import UserSchema, UserAdminCreateSchema
+from schemas.user_schema import UserSchema, UserAdminCreateSchema, UserChangePasswordSchema
 
 user = APIRouter(prefix="/users", tags=["User"])
 
@@ -26,7 +26,7 @@ def get_all_users(db: Session = Depends(get_db)):
 def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
     user_find = UserRepository.find_by_id(db, User, user_id)
     if not user_find:
-        return ResponseSchema.from_api_route(status_code=404, message="User not found").dict(exclude_none=True)
+        return ResponseSchema.from_api_route(status_code=404, data="User not found").dict(exclude_none=True)
     return ResponseSchema.from_api_route(status_code=200, data=user_find).dict(exclude_none=True)
 
 
@@ -34,7 +34,7 @@ def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
 def get_user_by_role(role: str, db: Session = Depends(get_db)):
     users = UserRepository.find_by_role(db, role)
     if not users:
-        return ResponseSchema.from_api_route(status_code=404, message="Users not found").dict(exclude_none=True)
+        return ResponseSchema.from_api_route(status_code=404, data="Users not found").dict(exclude_none=True)
     return ResponseSchema.from_api_route(status_code=200, data=users).dict(exclude_none=True)
 
 
@@ -42,7 +42,7 @@ def get_user_by_role(role: str, db: Session = Depends(get_db)):
 def get_user_by_email(email: str, db: Session = Depends(get_db)):
     user_find = UserRepository.find_by_email(db, email)
     if not user_find:
-        return ResponseSchema.from_api_route(status_code=404, message="User not found").dict(exclude_none=True)
+        return ResponseSchema.from_api_route(status_code=404, data="User not found").dict(exclude_none=True)
     return ResponseSchema.from_api_route(status_code=200, data=user_find).dict(exclude_none=True)
 
 
@@ -66,7 +66,7 @@ def create_user(user_create: UserAdminCreateSchema, db: Session = Depends(get_db
 def update_user(user_id: int, user_update: UserAdminCreateSchema, db: Session = Depends(get_db)):
     user_find = UserRepository.find_by_id(db, User, user_id)
     if not user_find:
-        return ResponseSchema.from_api_route(status_code=404, message="User not found").dict(exclude_none=True)
+        return ResponseSchema.from_api_route(status_code=404, data="User not found").dict(exclude_none=True)
     user_find.email = user_update.email
     user_find.hashed_password = pwd_context.hash(user_update.password)
     user_find.user_role = user_update.user_role
@@ -77,10 +77,10 @@ def update_user(user_id: int, user_update: UserAdminCreateSchema, db: Session = 
 
 
 @user.put("/password/{user_id}", dependencies=[Depends(JWTBearer())], response_model=ResponseSchema[UserSchema])
-def update_user_password(user_id: int, user_update: UserAdminCreateSchema, db: Session = Depends(get_db)):
+def update_user_password(user_id: int, user_update: UserChangePasswordSchema, db: Session = Depends(get_db)):
     user_find = UserRepository.find_by_id(db, User, user_id)
     if not user_find:
-        return ResponseSchema.from_api_route(status_code=404, message="User not found").dict(exclude_none=True)
+        return ResponseSchema.from_api_route(status_code=404, data="User not found").dict(exclude_none=True)
     user_find.hashed_password = pwd_context.hash(user_update.password)
     user_ed = UserRepository.update(db, user_find)
     return ResponseSchema.from_api_route(status_code=200, data=user_ed).dict(exclude_none=True)
@@ -90,7 +90,7 @@ def update_user_password(user_id: int, user_update: UserAdminCreateSchema, db: S
 def update_status_active(user_id: int, db: Session = Depends(get_db)):
     user_find = UserRepository.find_by_id(db, User, user_id)
     if not user_find:
-        return ResponseSchema.from_api_route(status_code=404, message="User not found").dict(exclude_none=True)
+        return ResponseSchema.from_api_route(status_code=404, data="User not found").dict(exclude_none=True)
     user_find.is_active = not user_find.is_active
     user_ed = UserRepository.update(db, user_find)
     return ResponseSchema.from_api_route(status_code=200, data=user_ed).dict(exclude_none=True)
@@ -99,11 +99,11 @@ def update_status_active(user_id: int, db: Session = Depends(get_db)):
 @user.delete("/{user_id}", dependencies=[Depends(JWTBearer())], response_model=ResponseSchema[UserSchema])
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     if user_id == 1:
-        return ResponseSchema.from_api_route(status_code=403, message="User not allowed to delete").dict(
+        return ResponseSchema.from_api_route(status_code=403, data="User not allowed to delete").dict(
             exclude_none=True)
     user_find = UserRepository.find_by_id(db, User, user_id)
     if not user_find:
-        return ResponseSchema.from_api_route(status_code=404, message="User not found").dict(exclude_none=True)
+        return ResponseSchema.from_api_route(status_code=404, data="User not found").dict(exclude_none=True)
     user_info = UserInformationRepository.find_by_user_id(db, user_id)
     UserRepository.delete(db, user_find)
     UserInformationRepository.delete(db, user_info)

@@ -25,6 +25,23 @@ class UserCreateSchema(BaseModel):
         return values
 
 
+class UserChangePasswordSchema(BaseModel):
+    password: str
+    confirm_password: str
+
+    @root_validator()
+    def validate_password(cls, values):
+        password = values.get('password')
+        confirm_password = values.get('confirm_password')
+        if (password != confirm_password):
+            raise HTTPException(status_code=400, detail="Password and confirm password not match")
+        if password is None or (len(password) == 0) or (password == ''):
+            raise HTTPException(status_code=400, detail="Password is required")
+        if password and len(password) < 8:
+            raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+        return values
+
+
 class UserAdminCreateSchema(BaseModel):
     email: EmailStr
     full_name: str

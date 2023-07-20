@@ -14,3 +14,7 @@ class CartItemRepository(BaseRepository):
     @staticmethod
     def find_by_cart_id(db: Session, cart_id):
         return db.query(Cart).filter(Cart.cart_id == cart_id).first()
+
+    @staticmethod
+    def find_all_by_cart_id(db: Session, cart_id):
+        return db.query(Cart).filter(Cart.cart_id == cart_id).all()
