@@ -46,8 +46,9 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
+    description = Column(String(255), default="", nullable=True)
 
-    products = relationship('Product', back_populates='category')
+    products = relationship('Product', back_populates='category', uselist=True)
     created_at = Column(String(255), default=datetime.datetime.utcnow())
     updated_at = Column(String(255), default=datetime.datetime.utcnow())
 
@@ -61,7 +62,7 @@ class Product(Base):
     description = Column(String(255), nullable=False)
     category_id = Column(Integer, ForeignKey('categories.id'))
 
-    images = relationship('Image', back_populates='product')
+    images = relationship('Image', back_populates='product', uselist=True)
     category = relationship('Category', back_populates='products')
     created_at = Column(String(255), default=datetime.datetime.utcnow())
     updated_at = Column(String(255), default=datetime.datetime.utcnow())
