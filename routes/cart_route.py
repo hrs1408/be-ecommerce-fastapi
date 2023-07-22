@@ -26,9 +26,7 @@ def get_cart_by_user_id(sub: int = Depends(get_current_user), db: Session = Depe
     return ResponseSchema.from_api_route(status_code=200, data=cart_exits).dict(exclude_none=True)
 
 
-
-
-@cart.post("/", response_model=ResponseSchema[CartItemSchema])
+@cart.post("/add", response_model=ResponseSchema[CartItemSchema])
 def insert_product_to_cart(data_in: PutProductToCartSchema, sub: int = Depends(get_current_user),
                            db: Session = Depends(get_db)):
     user_id = UserRepository.find_by_id(db, User, sub).id
